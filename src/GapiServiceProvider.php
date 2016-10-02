@@ -4,7 +4,7 @@ namespace Gtk\Gapi;
 
 use Illuminate\Support\ServiceProvider;
 
-class ApiResponseServiceProvider extends ServiceProvider
+class GapiServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
