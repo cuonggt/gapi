@@ -18,7 +18,7 @@ if (! function_exists('api_response')) {
             return $apiResponse;
         }
 
-        return $apiResponse->setStatusCode(200)->withArray($data, $headers);
+        return $apiResponse->setStatusCode($status)->withArray($data, $headers);
     }
 
 }
