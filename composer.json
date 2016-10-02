@@ -1,8 +1,8 @@
 {
     "name": "gtk/gapi",
-    "description": "API Response for Laravel & Lumen.",
+    "description": "A RESTful API package for the Laravel and Lumen frameworks.",
     "license": "MIT",
-    "keywords": ["gapi", "api response", "laravel", "lumen"],
+    "keywords": ["gapi", "api response", "restful", "laravel", "lumen"],
     "authors": [
         {
             "name": "Giang Thai Cuong",
@@ -19,6 +19,10 @@
     "require-dev": {
         "mockery/mockery": "dev-master",
         "phpunit/phpunit": "~4.0"
+    },
+    "suggest": {
+        "tymon/jwt-auth": "Protect your API with JSON Web Tokens.",
+        "barryvdh/laravel-cors": "Allow you to send Cross-Origin Resource Sharing headers with ACL-style per-url configuration."
     },
     "autoload": {
         "psr-4": {
