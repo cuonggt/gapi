@@ -65,18 +65,32 @@ class ApiResponse
 
     public function withItem($data, $transformer, $resourceKey = null, $meta = [], array $headers = [])
     {
+        return $this->withArray(
+            $this->makeItem($data, $transformer, $resourceKey, $meta)->toArray(),
+            $headers
+        );
+    }
+
+    public function withCollection($data, $transformer, $resourceKey = null, Cursor $cursor = null, $meta = [], array $headers = [])
+    {
+        return $this->withArray(
+            $this->makeCollection($data, $transformer, $resourceKey, $cursor, $meta)->toArray(),
+            $headers
+        );
+    }
+
+    public function makeItem($data, $transformer, $resourceKey = null, $meta = [])
+    {
         $resource = new Item($data, $transformer, $resourceKey);
 
         foreach ($meta as $metaKey => $metaValue) {
             $resource->setMetaValue($metaKey, $metaValue);
         }
 
-        $rootScope = $this->manager->createData($resource);
-
-        return $this->withArray($rootScope->toArray(), $headers);
+        return $this->manager->createData($resource);
     }
 
-    public function withCollection($data, $transformer, $resourceKey = null, Cursor $cursor = null, $meta = [], array $headers = [])
+    public function makeCollection($data, $transformer, $resourceKey = null, Cursor $cursor = null, $meta = [])
     {
         $resource = new Collection($data, $transformer, $resourceKey);
 
@@ -88,9 +102,7 @@ class ApiResponse
             $resource->setCursor($cursor);
         }
 
-        $rootScope = $this->manager->createData($resource);
-
-        return $this->withArray($rootScope->toArray(), $headers);
+        return $this->manager->createData($resource);
     }
 
     public function withPaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [], array $headers = [])
