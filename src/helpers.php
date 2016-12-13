@@ -3,7 +3,7 @@
 if (! function_exists('api_response')) {
 
     /**
-     * Get an ApiResponse instance
+     * Get an ApiResponse instance.
      *
      * @param  array  $data
      * @param  int  $status
