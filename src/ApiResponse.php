@@ -24,6 +24,8 @@ class ApiResponse
 
     const CODE_GONE = 'GEN-GONE';
 
+    const CODE_UNPROCESSABLE_ENTITY = 'GEN-UNPROCESSABLE-ENTITY';
+
     const CODE_INTERNAL_ERROR = 'GEN-INTERNAL-ERROR';
 
     protected $statusCode = 200;
@@ -36,7 +38,7 @@ class ApiResponse
     }
 
     /**
-     * Getter for statusCode
+     * Get the HTTP status code
      *
      * @return int
      */
@@ -46,9 +48,9 @@ class ApiResponse
     }
 
     /**
-     * Setter for statusCode
+     * Set the HTTP status code
      *
-     * @param int $statusCode Value to set
+     * @param int $statusCode
      * @return $this
      */
     public function setStatusCode($statusCode)
@@ -58,11 +60,28 @@ class ApiResponse
         return $this;
     }
 
+    /**
+     * Create a JSON response for an array
+     *
+     * @param array $data
+     * @param array $headers
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function withArray(array $data, array $headers = [])
     {
         return new JsonResponse($data, $this->statusCode, $headers);
     }
 
+    /**
+     * Create a JSON response for an item
+     *
+     * @param mixed $data
+     * @param callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string $resourceKey
+     * @param array $meta
+     * @param array $headers
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function withItem($data, $transformer, $resourceKey = null, $meta = [], array $headers = [])
     {
         return $this->withArray(
@@ -71,10 +90,29 @@ class ApiResponse
         );
     }
 
+    /**
+     * Create a JSON response for a collection
+     *
+     * @param mixed $data
+     * @param callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string $resourceKey
+     * @param \League\Fractal\Pagination\Cursor $cursor
+     * @param array $meta
+     * @param array $headers
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function withCollection($data, $transformer, $resourceKey = null, Cursor $cursor = null, $meta = [], array $headers = [])
     {
         return $this->withArray(
             $this->makeCollection($data, $transformer, $resourceKey, $cursor, $meta)->toArray(),
+            $headers
+        );
+    }
+
+    public function withPaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [], array $headers = [])
+    {
+        return $this->withArray(
+            $this->makePaginator($paginatorm, $transformer, $resourceKey, $meta)->toArray(),
             $headers
         );
     }
@@ -105,7 +143,7 @@ class ApiResponse
         return $this->manager->createData($resource);
     }
 
-    public function withPaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [], array $headers = [])
+    public function makePaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [])
     {
         $resource = new Collection($paginator->items(), $transformer, $resourceKey);
 
@@ -115,9 +153,7 @@ class ApiResponse
             $resource->setMetaValue($metaKey, $metaValue);
         }
 
-        $rootScope = $this->manager->createData($resource);
-
-        return $this->withArray($rootScope->toArray(), $headers);
+        return $this->manager->createData($resource);
     }
 
     public function withError($message, $errorCode = false, array $headers = [])
@@ -151,7 +187,8 @@ class ApiResponse
             404 => self::CODE_NOT_FOUND,
             405 => self::CODE_METHOD_NOT_ALLOWED,
             410 => self::CODE_GONE,
-            500 => self::CODE_INTERNAL_ERROR
+            422 => self::CODE_UNPROCESSABLE_ENTITY,
+            500 => self::CODE_INTERNAL_ERROR,
         ];
 
         return isset($errorCodes[$this->statusCode]) ? $errorCodes[$this->statusCode] : 'GEN-UNDEFINED-ERROR-CODE';

@@ -14,7 +14,9 @@
         "illuminate/support": "~5.0",
         "illuminate/contracts": "~5.0",
         "illuminate/http": "~5.0",
-        "league/fractal": "^0.13.0"
+        "illuminate/database": "~5.0",
+        "league/fractal": "^0.13.0",
+        "firebase/php-jwt": "^4.0"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
