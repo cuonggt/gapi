@@ -221,10 +221,7 @@ class ApiResponse
     public function withError($message, $errorCode = false, array $headers = [])
     {
         if ($this->statusCode === 200) {
-            trigger_error(
-                "You better have a really good reason for erroring on a 200...",
-                E_USER_WARNING
-            );
+            $this->setStatusCode(422);
         }
 
         if (false === $errorCode) {

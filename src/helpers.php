@@ -12,13 +12,13 @@ if (! function_exists('api_response')) {
      */
     function api_response($data = [], $status = 200, $headers = [])
     {
-        $apiResponse = app('api-response');
+        $api_response = app('api-response');
 
         if (func_num_args() == 0) {
-            return $apiResponse;
+            return $api_response;
         }
 
-        return $apiResponse->setStatusCode($status)->withArray($data, $headers);
+        return $api_response->setStatusCode($status)->withArray($data, $headers);
     }
 
 }
