@@ -18,7 +18,7 @@
         "league/fractal": "^0.13.0"
     },
     "require-dev": {
-        "mockery/mockery": "dev-master",
+        "mockery/mockery": "0.9.9",
         "phpunit/phpunit": "~4.0"
     },
     "suggest": {
