@@ -21,6 +21,13 @@ Next, register the `Gtk\Gapi\GapiServiceProvider` in your `config/app.php` file:
         Gtk\Gapi\GapiServiceProvider::class,
     ],
 
+If you are using Lumen, register the `Gtk\Gapi\GapiServiceProvider` in your `bootstrap/app.php` file:
+
+    // $app->register(App\Providers\AppServiceProvider::class);
+    // $app->register(App\Providers\AuthServiceProvider::class);
+    // $app->register(App\Providers\EventServiceProvider::class);
+    $app->register(Gtk\Gapi\GapiServiceProvider::class);
+    
 ## Basic Usage
 
 Next, you are ready to response API results for your application with `api_response()` helper function:
