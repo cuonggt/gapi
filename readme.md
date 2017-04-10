@@ -1,5 +1,10 @@
 # Gapi
 
+[![Build Status](https://travis-ci.org/gtkvn/gapi.svg?branch=v0.1.0)](https://travis-ci.org/gtkvn/gapi)
+[![Latest Stable Version](https://poser.pugx.org/gtk/gapi/v/stable)](https://packagist.org/packages/gtk/gapi)
+[![Total Downloads](https://poser.pugx.org/gtk/gapi/downloads)](https://packagist.org/packages/gtk/gapi)
+[![License](https://poser.pugx.org/gtk/gapi/license)](https://packagist.org/packages/gtk/gapi)
+
 Gapi provides a simple, convenient way to handle your API response properly.
 
 ## Install
