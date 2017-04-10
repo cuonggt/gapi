@@ -11,7 +11,7 @@ Gapi provides a simple, convenient way to handle your API response properly.
 
 To get started with Gapi, use Composer to add the package to your project's dependencies:
 
-    composer require laravel/socialite
+    composer require gtkvn/gapi
 
 Next, register the `Gtk\Gapi\GapiServiceProvider` in your `config/app.php` file:
 
