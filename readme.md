@@ -9,11 +9,15 @@ Gapi provides a simple, convenient way to handle your API response properly.
 
 ## Install
 
-To get started with Gapi, use Composer to add the package to your project's dependencies:
+Install via composer - edit your `composer.json` to require the package.
 
-    composer require gtk/gapi
+    "require": {
+        "gtk/gapi": "dev-master"
+    }
 
-Next, register the `Gtk\Gapi\GapiServiceProvider` in your `config/app.php` file:
+Then run `composer update` in your terminal to pull it in.
+
+Once this has finished, you will need to add the service provider to the providers array in your `config/app.php` file as follows:
 
     'providers' => [
         // Other service providers...
@@ -36,7 +40,7 @@ Next, you are ready to response API results for your application with `api_respo
     {
         // some code ...
 
-        return api_response()->withArray([
+        return api_response()->json([
             'success' => true,
         ]);
     }
