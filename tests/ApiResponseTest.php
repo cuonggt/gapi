@@ -5,7 +5,7 @@ class ApiResponseTest extends TestCase
     /** @test */
     public function it_can_returns_with_an_array()
     {
-        $response = $this->apiResponse->withArray(['foo' => 'bar']);
+        $response = $this->apiResponse->json(['foo' => 'bar']);
 
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -15,7 +15,7 @@ class ApiResponseTest extends TestCase
     /** @test */
     public function it_can_returns_with_an_error()
     {
-        $response = $this->apiResponse->withError('test', 'GEN-CUSTOM-ERROR-CODE');
+        $response = $this->apiResponse->withError('test', 'GEN-CUSTOM-ERROR-CODE', 422);
 
         $this->assertEquals(422, $response->getStatusCode());
 

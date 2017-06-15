@@ -28,16 +28,9 @@ class ApiResponse
 
     const CODE_INTERNAL_ERROR = 'GEN-INTERNAL-ERROR';
 
-    /**
-     * HTTP status code.
-     *
-     * @var int
-     */
-    protected $statusCode = 200;
+    const CODE_UNDEFINED_ERROR_CODE = 'GEN-UNDEFINED-ERROR-CODE';
 
     /**
-     * The manager.
-     *
      * @var \League\Fractal\Manager
      */
     protected $manager;
@@ -50,46 +43,25 @@ class ApiResponse
      */
     public function __construct(Manager $manager)
     {
-        $this->manager = $manager ? : new Manager;
+        $this->manager = $manager ?: new Manager;
     }
 
     /**
-     * Get the HTTP status code.
+     * Return a new JSON response from the application.
      *
-     * @return int
-     */
-    public function getStatusCode()
-    {
-        return $this->statusCode;
-    }
-
-    /**
-     * Set the HTTP status code.
-     *
-     * @param int $statusCode
-     * @return $this
-     */
-    public function setStatusCode($statusCode)
-    {
-        $this->statusCode = $statusCode;
-
-        return $this;
-    }
-
-    /**
-     * Create a JSON response with a given array data.
-     *
-     * @param array $data
-     * @param array $headers
+     * @param  mixed  $data
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Http\JsonResponse
      */
-    public function withArray(array $data, array $headers = [])
+    public function json($data = [], $status = 200, array $headers = [], $options = 0)
     {
-        return new JsonResponse($data, $this->statusCode, $headers);
+        return new JsonResponse($data, $status, $headers, $options);
     }
 
     /**
-     * Create a JSON response with a given model data.
+     * Return a new JSON response with a given model data.
      *
      * @param mixed $data
      * @param callable|\League\Fractal\TransformerAbstract $transformer
@@ -100,14 +72,15 @@ class ApiResponse
      */
     public function withItem($data, $transformer, $resourceKey = null, $meta = [], array $headers = [])
     {
-        return $this->withArray(
+        return $this->json(
             $this->makeItem($data, $transformer, $resourceKey, $meta)->toArray(),
+            200,
             $headers
         );
     }
 
     /**
-     * Create a JSON response with a given collection data.
+     * Return a new JSON response with a given collection data.
      *
      * @param mixed $data
      * @param callable|\League\Fractal\TransformerAbstract $transformer
@@ -119,14 +92,15 @@ class ApiResponse
      */
     public function withCollection($data, $transformer, $resourceKey = null, Cursor $cursor = null, $meta = [], array $headers = [])
     {
-        return $this->withArray(
+        return $this->json(
             $this->makeCollection($data, $transformer, $resourceKey, $cursor, $meta)->toArray(),
+            200,
             $headers
         );
     }
 
     /**
-     * Create a JSON response with a given paginator data.
+     * Return a new JSON response with a given paginator data.
      *
      * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator
      * @param callable|\League\Fractal\TransformerAbstract $transformer
@@ -137,20 +111,21 @@ class ApiResponse
      */
     public function withPaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [], array $headers = [])
     {
-        return $this->withArray(
+        return $this->json(
             $this->makePaginator($paginatorm, $transformer, $resourceKey, $meta)->toArray(),
+            200,
             $headers
         );
     }
 
     /**
-     * Create an response array with a given model data.
+     * Create a fractal resource with a given model data.
      *
      * @param mixed $data
      * @param callable|\League\Fractal\TransformerAbstract $transformer
      * @param string $resourceKey
      * @param array $meta
-     * @return array
+     * @return mixed
      */
     public function makeItem($data, $transformer, $resourceKey = null, $meta = [])
     {
@@ -164,14 +139,14 @@ class ApiResponse
     }
 
     /**
-     * Create an response array with a given collection data.
+     * Create a fractal resource with a given collection data.
      *
      * @param mixed $data
      * @param callable|\League\Fractal\TransformerAbstract $transformer
      * @param string $resourceKey
      * @param \League\Fractal\Pagination\Cursor $cursor
      * @param array $meta
-     * @return array
+     * @return mixed
      */
     public function makeCollection($data, $transformer, $resourceKey = null, Cursor $cursor = null, $meta = [])
     {
@@ -189,13 +164,13 @@ class ApiResponse
     }
 
     /**
-     * Create an response array with a given paginator data.
+     * Create a fractal resource with a given paginator data.
      *
      * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator
      * @param callable|\League\Fractal\TransformerAbstract $transformer
      * @param string $resourceKey
      * @param array $meta
-     * @return array
+     * @return mixed
      */
     public function makePaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [])
     {
@@ -211,38 +186,36 @@ class ApiResponse
     }
 
     /**
-     * Create a JSON response with an error.
+     * Create a new JSON response with an error.
      *
-     * @param string $message
-     * @param mixed $errorCode
-     * @param array $headers
+     * @param  mixed $message
+     * @param  mixed $code
+     * @param  int  $status
+     * @param  array $headers
      * @return \Illuminate\Http\JsonResponse
      */
-    public function withError($message, $errorCode = false, array $headers = [])
+    public function withError($message = '', $code = null, $status = 422, array $headers = [])
     {
-        if ($this->statusCode === 200) {
-            $this->setStatusCode(422);
+        if (! $code) {
+            $code = $this->getDefaultErrorCode($status);
         }
 
-        if (false === $errorCode) {
-            $errorCode = $this->getErrorCode();
-        }
-
-        return $this->withArray([
+        return $this->json([
             'error' => [
-                'code' => $errorCode,
-                'http_code' => $this->statusCode,
+                'code' => $code,
+                'http_code' => $status,
                 'message' => $message,
-            ]
-        ], $headers);
+            ],
+        ], $status, $headers);
     }
 
     /**
-     * Get the error code associated with the HTTP status code.
+     * Get the default error code associated with the HTTP status code.
      *
+     * @param  int  $status
      * @return mixed
      */
-    protected function getErrorCode()
+    protected function getDefaultErrorCode($status)
     {
         $errorCodes = [
             400 => self::CODE_BAD_REQUEST,
@@ -255,19 +228,19 @@ class ApiResponse
             500 => self::CODE_INTERNAL_ERROR,
         ];
 
-        return isset($errorCodes[$this->statusCode]) ? $errorCodes[$this->statusCode] : 'GEN-UNDEFINED-ERROR-CODE';
+        return isset($errorCodes[$status]) ? $errorCodes[$status] : self::CODE_UNDEFINED_ERROR_CODE;
     }
 
     /**
      * Create a JSON response with a 400 HTTP status code and a given message.
      *
-     * @param string $message
+     * @param mixed $message
      * @param array $headers
      * @return \Illuminate\Http\JsonResponse
      */
     public function errorBadRequest($message = 'Bad Request', array $headers = [])
     {
-        return $this->setStatusCode(400)->withError($message, self::CODE_BAD_REQUEST, $headers);
+        return $this->withError($message, self::CODE_BAD_REQUEST, 400, $headers);
     }
 
     /**
@@ -279,7 +252,7 @@ class ApiResponse
      */
     public function errorUnauthorized($message = 'Unauthorized', array $headers = [])
     {
-        return $this->setStatusCode(401)->withError($message, self::CODE_UNAUTHORIZED, $headers);
+        return $this->withError($message, self::CODE_UNAUTHORIZED, 401, $headers);
     }
 
     /**
@@ -291,7 +264,7 @@ class ApiResponse
      */
     public function errorForbidden($message = 'Forbidden', array $headers = [])
     {
-        return $this->setStatusCode(403)->withError($message, self::CODE_FORBIDDEN, $headers);
+        return $this->withError($message, self::CODE_FORBIDDEN, 403, $headers);
     }
 
     /**
@@ -303,7 +276,7 @@ class ApiResponse
      */
     public function errorNotFound($message = 'Resource Not Found', array $headers = [])
     {
-        return $this->setStatusCode(404)->withError($message, self::CODE_NOT_FOUND, $headers);
+        return $this->withError($message, self::CODE_NOT_FOUND, 404, $headers);
     }
 
     /**
@@ -315,7 +288,7 @@ class ApiResponse
      */
     public function errorMethodNotAllowed($message = 'Method Not Allowed', array $headers = [])
     {
-        return $this->setStatusCode(405)->withError($message, self::CODE_METHOD_NOT_ALLOWED, $headers);
+        return $this->withError($message, self::CODE_METHOD_NOT_ALLOWED, 405, $headers);
     }
 
     /**
@@ -327,7 +300,7 @@ class ApiResponse
      */
     public function errorGone($message = 'Resource No Longer Available', array $headers = [])
     {
-        return $this->setStatusCode(410)->withError($message, self::CODE_GONE, $headers);
+        return $this->withError($message, self::CODE_GONE, 410, $headers);
     }
 
     /**
@@ -339,7 +312,7 @@ class ApiResponse
      */
     public function errorUnprocessableEntity($message = 'Unprocessable Entity', array $headers = [])
     {
-        return $this->setStatusCode(422)->withError($message, self::CODE_UNPROCESSABLE_ENTITY, $headers);
+        return $this->withError($message, self::CODE_UNPROCESSABLE_ENTITY, 422, $headers);
     }
 
     /**
@@ -351,7 +324,7 @@ class ApiResponse
      */
     public function errorInternalError($message = 'Internal Error', array $headers = [])
     {
-        return $this->setStatusCode(500)->withError($message, self::CODE_INTERNAL_ERROR, $headers);
+        return $this->withError($message, self::CODE_INTERNAL_ERROR, 500, $headers);
     }
 
     /**
