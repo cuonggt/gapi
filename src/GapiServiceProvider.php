@@ -13,7 +13,7 @@ class GapiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // 
+        //
     }
 
     /**

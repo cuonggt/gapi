@@ -196,13 +196,9 @@ class ApiResponse
      */
     public function withError($message = '', $code = null, $status = 422, array $headers = [])
     {
-        if (! $code) {
-            $code = $this->getDefaultErrorCode($status);
-        }
-
         return $this->json([
             'error' => [
-                'code' => $code,
+                'code' => $code ?: $this->getDefaultErrorCode($status),
                 'http_code' => $status,
                 'message' => $message,
             ],
