@@ -3,7 +3,7 @@
 class ApiResponseTest extends TestCase
 {
     /** @test */
-    public function it_can_returns_with_an_array()
+    public function it_returns_with_an_array()
     {
         $response = $this->apiResponse->json(['foo' => 'bar']);
 
@@ -13,7 +13,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_an_error()
+    public function it_returns_with_an_error()
     {
         $response = $this->apiResponse->withError('test', 'GEN-CUSTOM-ERROR-CODE', 422);
 
@@ -29,7 +29,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_bad_request_error()
+    public function it_returns_with_a_bad_request_error()
     {
         $response = $this->apiResponse->errorBadRequest('bad request message');
 
@@ -45,7 +45,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_an_unauthorized_error()
+    public function it_returns_with_an_unauthorized_error()
     {
         $response = $this->apiResponse->errorUnauthorized('unauthorized message');
 
@@ -61,7 +61,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_forbidden_error()
+    public function it_returns_with_a_forbidden_error()
     {
         $response = $this->apiResponse->errorForbidden('forbidden message');
 
@@ -77,7 +77,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_not_found_error()
+    public function it_returns_with_a_not_found_error()
     {
         $response = $this->apiResponse->errorNotFound('not found message');
 
@@ -93,7 +93,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_method_not_allowed_error()
+    public function it_returns_with_a_method_not_allowed_error()
     {
         $response = $this->apiResponse->errorMethodNotAllowed('method not allowed message');
 
@@ -109,7 +109,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_gone_error()
+    public function it_returns_with_a_gone_error()
     {
         $response = $this->apiResponse->errorGone('gone message');
 
@@ -125,7 +125,7 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_unprocessable_entity_error()
+    public function it_returns_with_a_unprocessable_entity_error()
     {
         $response = $this->apiResponse->errorUnprocessableEntity('unprocessable entity message');
 
@@ -141,7 +141,27 @@ class ApiResponseTest extends TestCase
     }
 
     /** @test */
-    public function it_can_returns_with_a_internal_error()
+    public function it_returns_with_an_error_with_message_and_array_data()
+    {
+        $response = $this->apiResponse->errorUnprocessableEntity([
+            'message' => 'invalid',
+            'errors' => ['foo' => 'bar'],
+        ]);
+
+        $this->assertEquals(422, $response->getStatusCode());
+
+        $this->assertEquals([
+            'error' => [
+                'code' => 'GEN-UNPROCESSABLE-ENTITY',
+                'http_code' => 422,
+                'message' => 'invalid',
+                'errors' => ['foo' => 'bar'],
+            ],
+        ], json_decode($response->getContent(), true));
+    }
+
+    /** @test */
+    public function it_returns_with_a_internal_error()
     {
         $response = $this->apiResponse->errorInternalError('internal error message');
 

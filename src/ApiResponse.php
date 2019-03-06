@@ -112,7 +112,7 @@ class ApiResponse
     public function withPaginator(LengthAwarePaginator $paginator, $transformer, $resourceKey = null, $meta = [], array $headers = [])
     {
         return $this->json(
-            $this->makePaginator($paginatorm, $transformer, $resourceKey, $meta)->toArray(),
+            $this->makePaginator($paginator, $transformer, $resourceKey, $meta)->toArray(),
             200,
             $headers
         );
@@ -197,11 +197,10 @@ class ApiResponse
     public function withError($message = '', $code = null, $status = 422, array $headers = [])
     {
         return $this->json([
-            'error' => [
+            'error' =>  array_merge([
                 'code' => $code ?: $this->getDefaultErrorCode($status),
                 'http_code' => $status,
-                'message' => $message,
-            ],
+            ], is_array($message) ? $message : compact('message')),
         ], $status, $headers);
     }
 
